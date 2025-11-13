@@ -20,6 +20,14 @@ const CardOfProduct : React.FC<CardProps> = ({
     status,
     priority,
 }) => {
+    const formattedDate = new Date(date).toLocaleDateString("ru-RU", {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit"
+        });
+        
     return (
         <Card>
             <Grid container spacing={2}> 
@@ -35,14 +43,14 @@ const CardOfProduct : React.FC<CardProps> = ({
             />
             </Grid>
 
-            <Grid size={{ xs: 12, sm: 6}}>
+            <Grid size={{ xs: 8, sm: 8}}>
             <CardContent>
-                <Typography> {title}</Typography>
-                <Typography> {price}</Typography>
-                <Typography> {category}</Typography>
-                <Typography> {date}</Typography>
-                <Typography> {status}</Typography>
-                <Typography> {priority}</Typography>
+                <Typography> Название: {title}</Typography>
+                <Typography> Стоимость: {price} рублей</Typography>
+                <Typography> Категория: {category}</Typography>
+                <Typography> Дата создания: {formattedDate}</Typography>
+                <Typography> Статус: {status}</Typography>
+                <Typography> Приоритет: {priority}</Typography>
             </CardContent>
             </Grid>
         </Grid>

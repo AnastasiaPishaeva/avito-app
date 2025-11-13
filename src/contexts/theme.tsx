@@ -72,7 +72,7 @@ const theme = createTheme({
         toClick: "#6B5195"},
     },
     typography: {
-      fontFamily: "'Comfortaa', cursive",
+      fontFamily: "'Montserrat', cursive",
       h1: {
         fontFamily: "'Archivo Black', sans-serif",
         fontSize: "70px",
