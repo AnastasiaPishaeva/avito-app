@@ -3,6 +3,7 @@ import theme from "./contexts/theme";
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { ThemeProvider, CssBaseline } from "@mui/material";
 import MainPage from './pages/main-page';
+import AdDetailsPage from './pages/item-page';
 
 function App() {
   return (
@@ -11,7 +12,7 @@ function App() {
         <BrowserRouter>
         <Routes>
           <Route path="/" element={<MainPage />} />
-          {/* <Route path="/item/:id" element={<Item />} /> */}
+          <Route path="/advertisement/:adId" element={<AdDetailsPage />} />
         </Routes>
       </BrowserRouter>
       </CssBaseline>

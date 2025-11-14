@@ -57,23 +57,13 @@ const MainPage = () => {
     };
 
     const handleAdClick = (adId: string) => {
-        navigate(`/advertisement/${adId}`, { state: { adData: adId } });
+        console.log("Клик по объявлению:", adId);
+        navigate(`/advertisement/${adId}`);
     };
 
     useEffect(() => {
         fetchAds(filters);
     }, [filters,  currentPage]);
-
-
-    // useEffect(() => {
-    //     api
-    //     .get(`/ads`) 
-    //     .then((res) => {
-    //         console.log("Получено с сервера:", res.data);
-    //         setProducts(res.data.ads);
-    //     })
-    //     .catch((err) => console.error("Ошибка загрузки данных:", err));
-    //     }, [])
     
     return(
         <Box sx ={{width : "100%"}}>
