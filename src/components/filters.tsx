@@ -78,7 +78,8 @@ export default function Filters({ onChange }: FiltersProps) {
             <Typography >Категория</Typography>
             <TextField
             name="categoryId"
-            type="number"
+            select
+            type="string"
             value={filters.categoryId}
             onChange={handleChange}
             size="small"
