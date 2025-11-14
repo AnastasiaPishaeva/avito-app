@@ -4,7 +4,7 @@ import {Grid, Box, Typography, TextField } from "@mui/material";
 import Card from '../components/card-of-product';
 import api from "../api/api";
 import Filters from "../components/filters";
-import { Height } from "@mui/icons-material";
+import { useNavigate } from 'react-router-dom';
 import type { Product, Info } from "../types/product";
 
 // interface Product {
@@ -31,6 +31,7 @@ const MainPage = () => {
     const [filters, setFilters] = useState<Record<string, any>>({});
     const [info, setInfo] = useState<Info>();
     const [currentPage, setCurrentPage] = useState(1);
+    const navigate = useNavigate();
 
     const fetchAds = async (params = {}) => {
         try {
@@ -55,6 +56,9 @@ const MainPage = () => {
         }
     };
 
+    const handleAdClick = (adId: string) => {
+        navigate(`/advertisement/${adId}`, { state: { adData: adId } });
+    };
 
     useEffect(() => {
         fetchAds(filters);
@@ -72,13 +76,21 @@ const MainPage = () => {
     //     }, [])
     
     return(
-        <Box>
+        <Box sx ={{width : "100%"}}>
         <Filters onChange={setFilters} />
         <Typography sx={{mb : 2}}>Всего объявлений: {info?.totalItems}</Typography>
         <Grid container spacing={6}>
             {products.map((card: Product) => (
                 <Grid size={{ xs: 12, sm: 6 }} 
                 key={card.id}
+                onClick={() => handleAdClick(String(card.id))}
+                sx={{
+                    cursor: "pointer",       
+                    transition: "0.3s",
+                    "&:hover": {
+                        transform: "scale(1.02)",
+                    }
+                }}
                 >
                     <Card
                         img = {card.images[0]}
@@ -86,8 +98,13 @@ const MainPage = () => {
                         price={card.price}
                         date={card.createdAt}
                         category={card.category}
-                        status={card.status}
-                        priority={card.priority}
+                        status={card.status === "pending" ? ("На модерации") : 
+                            card.status === "approved" ? ("Одобрено") :
+                            card.status === "rejected" ? ("Отклонено") : ("Error")
+                        }
+                        priority={card.priority === "normal" ? ("Обычный") :
+                            card.priority === "urgent" ? ("Срочный") : ("Error")
+                        }
                         >
                     </Card>
                 </Grid>
@@ -110,7 +127,6 @@ const MainPage = () => {
                 / {info?.totalPages}
             </Typography>
 
-            {/* <Typography > / {info?.totalPages}</Typography> */}
         </Grid>
         </Box>
     )

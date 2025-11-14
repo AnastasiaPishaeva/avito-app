@@ -40,7 +40,7 @@ export default function Filters({ onChange }: FiltersProps) {
   };
 
   return (
-    <Box p={2} sx={{ backgroundColor: "white", borderRadius: 2, boxShadow: 1, marginBottom : 3 }}>
+    <Box p={2} sx={{ backgroundColor: "white", borderRadius: 2, boxShadow: 1, marginBottom : 3, width : "100%" }}>
       <Typography> Фильтры </Typography>
       <Grid container direction="column" spacing={2} flexWrap="wrap" sx={{textAlign : "left"}}>
         <Grid container>
