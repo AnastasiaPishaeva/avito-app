@@ -11,7 +11,7 @@ type FiltersProps = {
 const Filters: React.FC<FiltersProps> = ({ onChange, categories }) => {
   const theme = useTheme();
   const [filters, setFilters] = useState({
-    status: "",
+    status: [] as string[],
     categoryId: "",
     minPrice: "",
     maxPrice: "",
@@ -31,7 +31,7 @@ const Filters: React.FC<FiltersProps> = ({ onChange, categories }) => {
 
   const handleReset = () => {
     const cleared = {
-      status: "",
+      status: [] as string[],
       categoryId: "",
       minPrice: "",
       maxPrice: "",
@@ -68,9 +68,11 @@ const Filters: React.FC<FiltersProps> = ({ onChange, categories }) => {
             value={filters.status}
             onChange={handleChange}
             size="small"
+            SelectProps={{
+              multiple: true
+            }}
             sx={{ width: "100%" }}
             >
-            <MenuItem value="">Все</MenuItem>
             <MenuItem value="pending">На модерации</MenuItem>
             <MenuItem value="approved">Одобрено</MenuItem>
             <MenuItem value="rejected">Отклонено</MenuItem>
