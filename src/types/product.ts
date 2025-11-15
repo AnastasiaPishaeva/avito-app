@@ -82,3 +82,9 @@ export interface ActivityData {
   rejected: number;
   requestChanges: number;
 }
+
+export interface DecisionsData {
+  approved: number;
+  rejected: number;
+  requestChanges: number;
+}

@@ -2,8 +2,8 @@ import { useState, useEffect } from 'react';
 import {Grid, Typography, Box, Card, CardContent, Button, TextField, MenuItem } from "@mui/material";
 import api from '../api/api';
 import { useTheme } from "@mui/material/styles";
-import type { ActivityData, ModeratorHistory, Moderator, ModeratorStats, Statistic, StatsSummary} from "../types/product";
-import { BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from "recharts";
+import type { ActivityData, DecisionsData, Moderator, ModeratorStats, Statistic, StatsSummary} from "../types/product";
+import { BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 
 export const formatDate = (date: string ) => {
     const formattedDate = new Date(date);
@@ -20,6 +20,7 @@ const Analytics = () => {
   const [statisticInfo, setstatisticInfo] = useState<StatsSummary>({} as StatsSummary);
   const [period, setPeriod] = useState<string>("week");
   const [activityData, setActivityData] = useState<ActivityData[]>([]);
+  const [decisionsData, setDecisionsData] = useState<DecisionsData>();
   const fetchStat = async (params = {}) => {
         try {
         const res = await api.get(`/stats/summary`, { params: {period} });
@@ -34,30 +35,45 @@ const Analytics = () => {
         setPeriod(value);
     };
 
-    const fetchActivity = async (period = "week") => {
+    const fetchActivity = async (params = {}) => {
         try {
             const res = await api.get("/stats/chart/activity", { params: { period } });
             setActivityData(res.data); 
+            console.log("данные с сервера activity:", res.data);
         } catch (err) {
             console.error("Ошибка загрузки активности:", err);
         }
     };
 
-    const chartData = activityData.map(day => ({
+    const fetchDecisions = async (params = {}) => {
+        try {
+            const res = await api.get("/stats/chart/decisions", { params: { period } });
+            setDecisionsData(res.data); 
+            console.log("данные с сервера decisions:", res.data);
+        } catch (err) {
+            console.error("Ошибка загрузки решений:", err);
+        }
+    };
+
+    const chartData1 = activityData.map(day => ({
         date: new Date(day.date).toLocaleDateString("ru-RU", { weekday: "short", day: "numeric", month: "numeric" }),
         Одобрено: day.approved,
         Отклонено: day.rejected,
         Доработка: day.requestChanges,
     }));
+
+    const chartData2 = [
+    { name: "Одобрено", value: decisionsData?.approved},
+    { name: "Отклонено", value: decisionsData?.rejected },
+    { name: "На доработку", value: decisionsData?.requestChanges },
+  ];
     
 
     useEffect(() => {
         fetchStat();
-        }, [period]);
-
-    useEffect(() => {
         fetchActivity();
-        }, []);
+        fetchDecisions();
+        }, [period]);
 
 
   return(
@@ -116,12 +132,13 @@ const Analytics = () => {
             </Grid>
         </Grid>
         )}
-        <Box width="100%" height={350} mt={3}>
-            <Typography variant="h6" mb={2} sx={{ textAlign: "center" }}>
-                График активности за последнюю неделю
+
+        <Box width="100%" height={350} mt={3} mb = {8}>
+            <Typography mb={2} sx={{ textAlign: "center" }}>
+                График активности
             </Typography>
             <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={chartData} margin={{ top: 20, right: 30, left: 0, bottom: 20 }}>
+                <BarChart data={chartData1} margin={{ top: 20, right: 30, left: 0, bottom: 20 }}>
                 <XAxis dataKey="date" />
                 <YAxis />
                 <Tooltip />
@@ -131,6 +148,31 @@ const Analytics = () => {
                 <Bar dataKey="Доработка" stackId="a" fill={theme.palette.background.yellow} />
                 </BarChart>
             </ResponsiveContainer>
+        </Box>
+
+        <Box width="100%">
+            <Typography mb={2} sx={{ textAlign: "center" }}>
+                Диаграмма распределения решений
+            </Typography>
+            <ResponsiveContainer width="50%" height={300}>
+                <PieChart>
+                    <Pie
+                    data={chartData2}
+                    dataKey="value"
+                    nameKey="name"
+                    cx="50%"
+                    cy="50%"
+                    outerRadius={80}
+                    label
+                    >
+                    <Cell  fill= {theme.palette.background.green} />
+                    <Cell  fill={theme.palette.background.red} />
+                    <Cell  fill={theme.palette.background.yellow} />
+                    </Pie>
+                    <Tooltip />
+                    <Legend />
+                </PieChart>
+                </ResponsiveContainer>
         </Box>
     </Box>
   )
