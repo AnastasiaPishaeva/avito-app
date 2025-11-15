@@ -108,6 +108,13 @@ const AdDetailsPage = () => {
                                 <Table rows={Object.entries(adDetails.characteristics)} />
                                 )}
                             <Typography> Продавец </Typography>
+                            {adDetails.seller && 
+                            <Grid>
+                            <Typography> Имя: {adDetails.seller.name} </Typography>
+                            <Typography> Рейтинг: {adDetails.seller.rating} </Typography>
+                            <Typography> Количество объявлений: {adDetails.seller.totalAds} </Typography>
+                            <Typography> На сайте с: {formatDate(adDetails.seller.registeredAt)} </Typography>
+                            </Grid>}
                             
                             </Grid>
                     
