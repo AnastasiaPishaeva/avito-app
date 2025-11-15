@@ -17,10 +17,10 @@ const Header = () => {
         justifyContent : "flex-end"}}>
 
       <nav style = {{display: "flex"}}>
-        <Link style = {{marginRight: theme.spacing(4), textDecoration: "none", 
+        <Link style = {{marginRight: theme.spacing(6), textDecoration: "none", 
             color: theme.palette.text.primary
          }} to="/">Список</Link>
-        <Link  style = {{marginRight: theme.spacing(4), textDecoration: "none",
+        <Link  style = {{marginRight: theme.spacing(6), textDecoration: "none",
             color: theme.palette.text.primary
           }} to="/FAQPage">Аналитика</Link>
       </nav>

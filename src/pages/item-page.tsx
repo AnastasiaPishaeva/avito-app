@@ -7,7 +7,7 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from "swiper/modules";
 import api from '../api/api';
 import { useTheme } from "@mui/material/styles";
-import type { Product, Info, Moderator, Seller } from "../types/product";
+import type { Product, Moderator, } from "../types/product";
 
 export const formatDate = (date: string ) => {
     const formattedDate = new Date(date);
@@ -47,6 +47,7 @@ const AdDetailsPage = () => {
         console.error("Ошибка загрузки объявления:", err);
         }
     };    
+    
 
     useEffect(() => {
         fetchAd();
@@ -79,7 +80,7 @@ const AdDetailsPage = () => {
             <Grid size={{xs : 12, sm : 6}} >
                 <Card sx ={{height : "100%"}}>
                     <CardContent>
-                        <Typography> История модерации</Typography>
+                        <Typography sx = {{fontWeight: "bold", color: theme.palette.purple.light}}> История модерации</Typography>
                         {adDetails.moderationHistory && adDetails.moderationHistory.map((chel: Moderator, index: number) => (
                             <Grid sx = {{textAlign : "left"}}>
                             <Typography> Имя: {chel.moderatorName} </Typography>
@@ -98,15 +99,28 @@ const AdDetailsPage = () => {
         <Grid size = {{xs : 12}} sx = {{mt : 6, width : "100%"}}>
              <Card sx ={{height : "100%"}}>
                     <CardContent>
-                        <Typography> Информация об объявлении</Typography>
+                        <Typography sx = {{fontWeight: "bold", color: theme.palette.purple.light}}> Информация об объявлении</Typography>
                             <Grid sx = {{textAlign : "left"}}>
-                            <Typography> Описание </Typography>
+                            <Typography> {adDetails.title}</Typography> 
+                            {/* Объявление 10: Услуги для продажи */}
+                            <Typography> Стоимость: {adDetails.price} рублей</Typography>
+                            <Typography> Категория: {adDetails.category}</Typography>
+                            <Typography> Дата создания: {formatDate(adDetails.createdAt)}</Typography>
+                            <Typography> Дата изменения: {formatDate(adDetails.updatedAt)}</Typography>
+                            <Typography> Статус: {adDetails.status === "pending" ? ("На модерации") : 
+                            adDetails.status === "approved" ? ("Одобрено") :
+                            adDetails.status === "rejected" ? ("Отклонено") : ("Error")}</Typography>
+                            <Typography> Приоритет: {adDetails.priority === "normal" ? ("Обычный") :
+                            adDetails.priority === "urgent" ? ("Срочный") : ("Error")}</Typography>
+                            <br/>
+                            <Typography sx = {{fontWeight: "bold", color: theme.palette.purple.light}}> Описание: </Typography>
                             <Typography> {adDetails.description} </Typography>
-                            <Typography> Характеристики: </Typography>
+                            <br/>
+                            <Typography sx = {{fontWeight: "bold", color: theme.palette.purple.light}}> Характеристики: </Typography>
                             {adDetails.characteristics && (
                                 <Table rows={Object.entries(adDetails.characteristics)} />
                                 )}
-                            <Typography> Продавец </Typography>
+                            <Typography sx = {{fontWeight: "bold", color: theme.palette.purple.light}}> Продавец </Typography>
                             {adDetails.seller && 
                             <Grid>
                             <Typography> Имя: {adDetails.seller.name} </Typography>
@@ -138,7 +152,7 @@ const AdDetailsPage = () => {
             </Grid>
         </Grid>
         <Grid container spacing={4} sx = {{mt : 6}}>
-            <Link to="/" style ={{color : "black", textDecoration: "none", cursor: "pointer",}}>
+            <Link to="/" style ={{color : theme.palette.text.primary, textDecoration: "none", cursor: "pointer",}}>
                 ← К списку
             </Link>
 

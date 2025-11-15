@@ -1,11 +1,15 @@
 import { useState } from "react";
 import { Box, TextField, MenuItem, Button, Stack, Typography, Grid } from "@mui/material";
+import { useTheme } from "@mui/material/styles";
 
 type FiltersProps = {
   onChange: (filters: Record<string, any>) => void;
+  categories: {id : number, name : string}[];
 };
 
-export default function Filters({ onChange }: FiltersProps) {
+
+const Filters: React.FC<FiltersProps> = ({ onChange, categories }) => {
+  const theme = useTheme();
   const [filters, setFilters] = useState({
     status: "",
     categoryId: "",
@@ -40,8 +44,8 @@ export default function Filters({ onChange }: FiltersProps) {
   };
 
   return (
-    <Box p={2} sx={{ backgroundColor: "white", borderRadius: 2, boxShadow: 1, marginBottom : 3, width : "100%" }}>
-      <Typography> Фильтры </Typography>
+    <Box p={2} sx={{ backgroundColor: theme.palette.background.paper, borderRadius: 2, boxShadow: 1, marginBottom : 3, width : "100%" }}>
+      <Typography sx = {{fontWeight: "bold", color: theme.palette.purple.light}}> Фильтры </Typography>
       <Grid container direction="column" spacing={2} flexWrap="wrap" sx={{textAlign : "left"}}>
         <Grid container>
             <Grid size={{xs: 12, sm: 4 }}>
@@ -52,7 +56,7 @@ export default function Filters({ onChange }: FiltersProps) {
             value={filters.search}
             onChange={handleChange}
             size="small"
-            sx={{ width: "100%" }}
+            sx={{ width: "100%"}}
             />
             </Grid>
             <Grid size={{xs: 12, sm: 4 }}>
@@ -84,7 +88,11 @@ export default function Filters({ onChange }: FiltersProps) {
             onChange={handleChange}
             size="small"
             sx={{ width: "100%" }}
-            />
+            >
+              {categories && categories.map(({ id, name }) => 
+                <MenuItem value = {id} >{name}</MenuItem>
+              )}
+            </TextField>
             </Grid>
         </Grid>
         {/* Цена */}
@@ -159,3 +167,4 @@ export default function Filters({ onChange }: FiltersProps) {
     </Box>
   );
 }
+export default Filters;

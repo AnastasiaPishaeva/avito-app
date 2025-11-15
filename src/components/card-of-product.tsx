@@ -44,8 +44,8 @@ const CardOfProduct : React.FC<CardProps> = ({
             </Grid>
 
             <Grid size={{ xs: 8, sm: 8}}>
-            <CardContent>
-                <Typography> Название: {title}</Typography>
+            <CardContent sx ={{textAlign : "left"}}>
+                <Typography> {title}</Typography>
                 <Typography> Стоимость: {price} рублей</Typography>
                 <Typography> Категория: {category}</Typography>
                 <Typography> Дата создания: {formattedDate}</Typography>

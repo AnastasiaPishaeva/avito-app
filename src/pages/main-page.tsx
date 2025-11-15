@@ -7,29 +7,12 @@ import Filters from "../components/filters";
 import { useNavigate } from 'react-router-dom';
 import type { Product, Info } from "../types/product";
 
-// interface Product {
-//     id: number;
-//     images: string[];
-//     title: string;
-//     price: number;
-//     category: string;
-//     createdAt: string;
-//     status: string;
-//     priority: string;
-// }
-
-// interface Info {
-//     totalItems: number;
-//     totalPages: number;
-//     currentPage: number;
-//     itemsPerPage: number;
-// }
-
 
 const MainPage = () => {
     const [products, setProducts] = useState<Product[]>([]);
     const [filters, setFilters] = useState<Record<string, any>>({});
     const [info, setInfo] = useState<Info>();
+    const [categoriesArray, setCategories] = useState<{ id: number; name: string }[]>([]);
     const [currentPage, setCurrentPage] = useState(1);
     const navigate = useNavigate();
 
@@ -44,9 +27,10 @@ const MainPage = () => {
             setProducts(res.data.ads);
             setInfo(res.data.pagination)
             console.log("Получено с сервера:", res.data);
+
             } catch (err) {
             console.error("Ошибка загрузки:", err);
-        }
+            }
     };
 
     const handlePageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -64,12 +48,29 @@ const MainPage = () => {
     useEffect(() => {
         fetchAds(filters);
     }, [filters,  currentPage]);
+
+    useEffect(() => {
+        api
+      .get("/ads") 
+      .then((res) => {
+        console.log("Получено с сервера:", res.data);
+        const categories = new Map<number, string>(); 
+
+            res.data.ads.forEach((ad: any) => {
+                if (ad.categoryId && ad.category) {
+                categories.set(ad.categoryId, ad.category);
+                }
+            });
+            setCategories(Array.from(categories, ([id, name]) => ({ id, name })));
+      })
+      .catch((err) => console.error("Ошибка загрузки данных:", err));
+    }, [])
     
     return(
-        <Box sx ={{width : "100%"}}>
-        <Filters onChange={setFilters} />
+        <Box sx ={{width : "100%", display : "flex", flexDirection: "column" }}>
+        <Filters onChange={setFilters} categories={categoriesArray}/>
         <Typography sx={{mb : 2}}>Всего объявлений: {info?.totalItems}</Typography>
-        <Grid container spacing={6}>
+        <Grid container spacing={6} sx ={{flexGrow: 1}}>
             {products.map((card: Product) => (
                 <Grid size={{ xs: 12, sm: 6 }} 
                 key={card.id}
@@ -114,7 +115,7 @@ const MainPage = () => {
                 sx={{ all : "initial" , textAlign : "center"}}
             />
             <Typography component="span" sx={{ ml: 2 }}>
-                / {info?.totalPages}
+                / {info?.totalPages === 0 ? (1) : info?.totalPages}
             </Typography>
 
         </Grid>
