@@ -1,12 +1,37 @@
 import React, { useState, useEffect } from 'react';
-import {Grid, Typography, Box } from "@mui/material";
+import {Grid, Typography, Box, Card, Divider, CardContent, } from "@mui/material";
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import "swiper/css";
 import "swiper/css/navigation";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from "swiper/modules";
 import api from '../api/api';
-import type { Product, Info } from "../types/product";
+import type { Product, Info, Moderator, Seller } from "../types/product";
+
+export const formatDate = (date: string ) => {
+    const formattedDate = new Date(date);
+    return formattedDate.toLocaleDateString("ru-RU", {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit"
+        })};
+export const Table = ({  rows }: { rows: string[][] }) => {
+    return (
+    <table style={{ marginTop: "1rem", borderCollapse: "collapse", marginBottom: "1rem" }}>
+        <tbody>
+        {rows.map((row, rIdx) => (
+            <tr key={rIdx}>
+            {row.map((cell, cIdx) => (
+                <td key={cIdx} style={{ border: "1px solid lightgray", padding: "4px" }}>{cell}</td>
+            ))}
+            </tr>
+        ))}
+        </tbody>
+    </table>
+    )
+};
 
 const AdDetailsPage = () => {
   const location = useLocation();
@@ -15,17 +40,18 @@ const AdDetailsPage = () => {
   const [adDetails, setAdDetails] = useState<Product>({} as Product);
   const fetchAd = async () => {
         try {
-        const res = await api.get(`/ads/10`);
+        const res = await api.get(`/ads/${adId}`);
         console.log("данные с сервера:", res.data);
         setAdDetails(res.data);
         } catch (err) {
         console.error("Ошибка загрузки объявления:", err);
         }
-    };
-  console.log("adData", adId);
-  useEffect(() => {
-    fetchAd();
-    }, [adId]);
+    };    
+
+    useEffect(() => {
+        console.log("Test");
+        fetchAd();
+        }, []);
 
   return(
     <Box sx = {{width : "100%"}}>
@@ -36,8 +62,8 @@ const AdDetailsPage = () => {
             navigation
             slidesPerView={1}
             >
-            {adDetails.images.map((picture: string, index: number) => (
-                <SwiperSlide key={index} style={{ paddingBottom: '16px' }}>
+            {adDetails.images && adDetails.images.map((picture: string, index: number) => (
+                <SwiperSlide key={index} >
                 <img
                 src={picture}
                 alt={`Фото объявления номер ${index + 1}`}
@@ -51,6 +77,42 @@ const AdDetailsPage = () => {
             ))}
             </Swiper>
             </Grid>
+            <Grid size={{xs : 12, sm : 6}} >
+                <Card sx ={{height : "100%"}}>
+                    <CardContent>
+                        <Typography> История модерации</Typography>
+                        {adDetails.moderationHistory && adDetails.moderationHistory.map((chel: Moderator, index: number) => (
+                            <Grid sx = {{textAlign : "left"}}>
+                            <Typography> Имя: {chel.moderatorName} </Typography>
+                            <Typography> Дата и время: {formatDate(chel.timestamp)} </Typography>
+                            <Typography> Решение: {chel.action === "requestChanges" ? ("Запрос изменений") : 
+                            chel.action === "approved" ? ("Одобрен") :
+                            chel.action === "rejected" ? ("Отклонен") : ("Error")} </Typography>
+                            {chel.comment && <Typography> Комментрий: {chel.comment} </Typography>}
+                            <Divider sx ={{borderBottomWidth: "2px"}} />
+                            </Grid>
+                        ))}
+                    </CardContent>
+                </Card>
+            </Grid>
+        </Grid>
+        <Grid size = {{xs : 12}} sx = {{mt : 6, width : "100%"}}>
+             <Card sx ={{height : "100%"}}>
+                    <CardContent>
+                        <Typography> Информация об объявлении</Typography>
+                            <Grid sx = {{textAlign : "left"}}>
+                            <Typography> Описание </Typography>
+                            <Typography> {adDetails.description} </Typography>
+                            <Typography> Характеристики: </Typography>
+                            {adDetails.characteristics && (
+                                <Table rows={Object.entries(adDetails.characteristics)} />
+                                )}
+                            <Typography> Продавец </Typography>
+                            
+                            </Grid>
+                    
+                    </CardContent>
+                </Card>
         </Grid>
 
     </Box>

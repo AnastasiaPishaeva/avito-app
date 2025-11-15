@@ -10,9 +10,9 @@ export interface Product {
     priority: string;
     description: string;
     updatedAt:string;
-    seller: string; //пока хз
-    characteristics: object;
-    moderationHistory: string; //пока хз
+    seller: Seller; 
+    characteristics: Record<string, string>;
+    moderationHistory: Moderator[]; 
 }
 
 export interface Info {
@@ -20,4 +20,23 @@ export interface Info {
     totalPages: number;
     currentPage: number;
     itemsPerPage: number;
+}
+
+export interface Moderator {
+    id: number;
+    moderatorId: number;
+    moderatorName:  string;
+    action: string;
+    reason: string;
+    comment: string;
+    timestamp: string;
+}
+
+export interface Seller {
+    id: number;
+    name: string;
+    rating: string;
+    totalAds: number;
+    registeredAt: string;
+ 
 }
