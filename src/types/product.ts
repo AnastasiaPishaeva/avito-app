@@ -12,7 +12,7 @@ export interface Product {
     updatedAt:string;
     seller: Seller; 
     characteristics: Record<string, string>;
-    moderationHistory: Moderator[]; 
+    moderationHistory: ModeratorHistory[]; 
 }
 
 export interface Info {
@@ -22,7 +22,7 @@ export interface Info {
     itemsPerPage: number;
 }
 
-export interface Moderator {
+export interface ModeratorHistory {
     id: number;
     moderatorId: number;
     moderatorName:  string;
@@ -39,4 +39,46 @@ export interface Seller {
     totalAds: number;
     registeredAt: string;
  
+}
+
+export interface Moderator{
+        id: number;
+        name: string;
+        email: string;
+        role: string;
+        statistics: ModeratorStats;
+        permissions: string[];
+}
+    
+export interface  ModeratorStats{
+        totalReviewed: number;
+        todayReviewed: number;
+        thisWeekReviewed: number;
+        thisMonthReviewed: number;
+        averageReviewTime: number;
+        approvalRate: number;
+}
+
+export interface StatsSummary{
+        totalReviewed: number;
+        totalReviewedToday: number;
+        totalReviewedThisWeek: number;
+        totalReviewedThisMonth: number;
+        approvedPercentage: number;
+        rejectedPercentage: number;
+        requestChangesPercentage: number;
+        averageReviewTime: number;
+}
+
+export interface Statistic{
+    period: string;
+    startDate : string;
+    endDate: string;
+}
+
+export interface ActivityData {
+  date: string; 
+  approved: number;
+  rejected: number;
+  requestChanges: number;
 }

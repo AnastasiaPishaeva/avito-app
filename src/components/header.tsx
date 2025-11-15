@@ -22,7 +22,7 @@ const Header = () => {
          }} to="/">Список</Link>
         <Link  style = {{marginRight: theme.spacing(6), textDecoration: "none",
             color: theme.palette.text.primary
-          }} to="/FAQPage">Аналитика</Link>
+          }} to="/statistic">Аналитика</Link>
       </nav>
 
       <Button onClick={toggleTheme} sx = {{backgroundColor: theme.palette.text.primary, width: "35px", height: "35px",}}>

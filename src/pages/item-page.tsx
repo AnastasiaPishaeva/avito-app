@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import {Grid, Typography, Box, Card, Divider, CardContent, Button } from "@mui/material";
-import { useLocation, useNavigate, useParams, Link } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import "swiper/css";
 import "swiper/css/navigation";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from "swiper/modules";
 import api from '../api/api';
 import { useTheme } from "@mui/material/styles";
-import type { Product, Moderator, } from "../types/product";
+import type { Product, ModeratorHistory, } from "../types/product";
 
 export const formatDate = (date: string ) => {
     const formattedDate = new Date(date);
@@ -81,7 +81,7 @@ const AdDetailsPage = () => {
                 <Card sx ={{height : "100%"}}>
                     <CardContent>
                         <Typography sx = {{fontWeight: "bold", color: theme.palette.purple.light}}> История модерации</Typography>
-                        {adDetails.moderationHistory && adDetails.moderationHistory.map((chel: Moderator, index: number) => (
+                        {adDetails.moderationHistory && adDetails.moderationHistory.map((chel: ModeratorHistory, index: number) => (
                             <Grid sx = {{textAlign : "left"}}>
                             <Typography> Имя: {chel.moderatorName} </Typography>
                             <Typography> Дата и время: {formatDate(chel.timestamp)} </Typography>
@@ -97,7 +97,7 @@ const AdDetailsPage = () => {
             </Grid>
         </Grid>
         <Grid size = {{xs : 12}} sx = {{mt : 6, width : "100%"}}>
-             <Card sx ={{height : "100%"}}>
+             <Card >
                     <CardContent>
                         <Typography sx = {{fontWeight: "bold", color: theme.palette.purple.light}}> Информация об объявлении</Typography>
                             <Grid sx = {{textAlign : "left"}}>
@@ -134,18 +134,18 @@ const AdDetailsPage = () => {
                     </CardContent>
                 </Card>
         </Grid>
-        <Grid container spacing = {8} sx = {{mt : 4}}>
-            <Grid size = {{xs: 7, sm : 4}}>
+        <Grid container spacing = {{xs : 4, sm: 8}} sx = {{mt : 4, justifyContent: "center"}}>
+            <Grid size = {{xs: 9, sm : 4}} >
                 <Button sx ={{background : theme.palette.background.green, color : "black", width : "100%", boxShadow : 2}}>
                     Одобрить
                 </Button>
             </Grid>
-            <Grid size = {{xs: 7, sm : 4}}>
+            <Grid size = {{xs: 9, sm : 4}}>
                 <Button sx ={{background : theme.palette.background.red, color : "black", width : "100%", boxShadow : 2}}>
                     Отклонить
                 </Button>
             </Grid>
-            <Grid size = {{xs: 7, sm : 4}}>
+            <Grid size = {{xs: 9, sm : 4}}>
                 <Button sx ={{background : theme.palette.background.yellow, color : "black", width : "100%", boxShadow : 2}}>
                     Доработать
                 </Button>

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Box, TextField, MenuItem, Button, Stack, Typography, Grid } from "@mui/material";
+import { Box, TextField, MenuItem, Button, Typography, Grid } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 
 type FiltersProps = {
