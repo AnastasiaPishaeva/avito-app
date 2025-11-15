@@ -58,7 +58,7 @@ const MainPage = () => {
 
     const handleAdClick = (adId: string) => {
         console.log("Клик по объявлению:", adId);
-        navigate(`/advertisement/${adId}`);
+        navigate(`/item/${adId}`);
     };
 
     useEffect(() => {

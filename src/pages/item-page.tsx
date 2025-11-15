@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import {Grid, Typography, Box, Card, Divider, CardContent, } from "@mui/material";
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import {Grid, Typography, Box, Card, Divider, CardContent, Button } from "@mui/material";
+import { useLocation, useNavigate, useParams, Link } from 'react-router-dom';
 import "swiper/css";
 import "swiper/css/navigation";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from "swiper/modules";
 import api from '../api/api';
+import { useTheme } from "@mui/material/styles";
 import type { Product, Info, Moderator, Seller } from "../types/product";
 
 export const formatDate = (date: string ) => {
@@ -34,8 +35,7 @@ export const Table = ({  rows }: { rows: string[][] }) => {
 };
 
 const AdDetailsPage = () => {
-  const location = useLocation();
-  const navigate = useNavigate();
+  const theme = useTheme();
   const { adId } = useParams();
   const [adDetails, setAdDetails] = useState<Product>({} as Product);
   const fetchAd = async () => {
@@ -49,7 +49,6 @@ const AdDetailsPage = () => {
     };    
 
     useEffect(() => {
-        console.log("Test");
         fetchAd();
         }, []);
 
@@ -120,6 +119,29 @@ const AdDetailsPage = () => {
                     
                     </CardContent>
                 </Card>
+        </Grid>
+        <Grid container spacing = {8} sx = {{mt : 4}}>
+            <Grid size = {{xs: 7, sm : 4}}>
+                <Button sx ={{background : theme.palette.background.green, color : "black", width : "100%", boxShadow : 2}}>
+                    Одобрить
+                </Button>
+            </Grid>
+            <Grid size = {{xs: 7, sm : 4}}>
+                <Button sx ={{background : theme.palette.background.red, color : "black", width : "100%", boxShadow : 2}}>
+                    Отклонить
+                </Button>
+            </Grid>
+            <Grid size = {{xs: 7, sm : 4}}>
+                <Button sx ={{background : theme.palette.background.yellow, color : "black", width : "100%", boxShadow : 2}}>
+                    Доработать
+                </Button>
+            </Grid>
+        </Grid>
+        <Grid container spacing={4} sx = {{mt : 6}}>
+            <Link to="/" style ={{color : "black", textDecoration: "none", cursor: "pointer",}}>
+                ← К списку
+            </Link>
+
         </Grid>
 
     </Box>

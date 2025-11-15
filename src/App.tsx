@@ -1,22 +1,24 @@
 import './App.css'
-import theme from "./contexts/theme";
+import { ThemeProviderWrapper } from "./contexts/theme";
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { ThemeProvider, CssBaseline } from "@mui/material";
+import { CssBaseline } from "@mui/material";
 import MainPage from './pages/main-page';
 import AdDetailsPage from './pages/item-page';
+import Header from './components/header';
 
 function App() {
   return (
-    <ThemeProvider theme={theme}>
+    <ThemeProviderWrapper>
       <CssBaseline>
         <BrowserRouter>
+        <Header/>
         <Routes>
           <Route path="/" element={<MainPage />} />
-          <Route path="/advertisement/:adId" element={<AdDetailsPage />} />
+          <Route path="/item/:adId" element={<AdDetailsPage />} />
         </Routes>
       </BrowserRouter>
       </CssBaseline>
-    </ThemeProvider>
+    </ThemeProviderWrapper>
   )
 }
 
