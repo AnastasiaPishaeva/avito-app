@@ -207,6 +207,36 @@ const AdDetailsPage = () => {
         setCurrentIndex(index)
     }, [adId, adsOrder]);
 
+    useEffect(() => {
+        const onKeyDown = (e: KeyboardEvent) => {
+            if (e.key === "ArrowRight") {
+                e.preventDefault();
+                handleNextAd();
+            }
+
+            if (e.key === "ArrowLeft") {
+                e.preventDefault();
+                handlePrevAd();
+            }
+
+
+            if (e.key.toLowerCase() === "a") {
+                e.preventDefault();
+                handleApprove();
+            }
+
+
+            if (e.key.toLowerCase() === "d") {
+                e.preventDefault();
+                openModal("reject");
+            }
+        };
+
+        window.addEventListener("keydown", onKeyDown);
+        return () => window.removeEventListener("keydown", onKeyDown);
+    }, [currentIndex, adsOrder, adId]);
+
+
   return(
     <Box sx = {{width : "100%"}}>
         <Grid container spacing={3}>
