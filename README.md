@@ -64,22 +64,25 @@
       └─ models/v1/data.js
       
 ---
+---
 
 ## Локальный запуск
 
 ### 1. Сервер (mock API)
 
+```
 cd tech/tech-internship/Tech Internships/Frontend/Frontend-trainee-assignment-autumn-2025/tech-int3-server
 npm install
 npm run dev
+```
 
 ### 2. Клиент
 В отдельном терминале:
-
+```
 cd avito-app
 npm install
 npm run dev
-
+```
 ## Навигация
 
 - /list — список объявлений, фильтры, сортировки.
