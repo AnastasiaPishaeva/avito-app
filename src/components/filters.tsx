@@ -1,46 +1,29 @@
 import { useState } from "react";
 import { Box, TextField, MenuItem, Button, Typography, Grid } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
+import { useFilters, type FiltersState } from "../contexts/filter";
 
 type FiltersProps = {
-  onChange: (filters: Record<string, any>) => void;
   categories: {id : number, name : string}[];
 };
 
 
-const Filters: React.FC<FiltersProps> = ({ onChange, categories }) => {
+const Filters: React.FC<FiltersProps> = ({ categories }) => {
   const theme = useTheme();
-  const [filters, setFilters] = useState({
-    status: [] as string[],
-    categoryId: "",
-    minPrice: "",
-    maxPrice: "",
-    search: "",
-    sortBy: "createdAt",
-    sortOrder: "desc",
-  });
+  const { filters, setFilters, resetFilters } = useFilters();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFilters(prev => ({ ...prev, [name]: value }));
-  };
 
-  const handleApply = () => {
-    onChange(filters);
+    if (name === "status") {
+      const selectedStatus = typeof value === "string" ? value.split(",") : value;
+      setFilters({ ...filters, [name]: selectedStatus });
+    } else {
+      setFilters({ ...filters, [name]: value });
+    }
   };
-
   const handleReset = () => {
-    const cleared = {
-      status: [] as string[],
-      categoryId: "",
-      minPrice: "",
-      maxPrice: "",
-      search: "",
-      sortBy: "createdAt",
-      sortOrder: "desc",
-    };
-    setFilters(cleared);
-    onChange(cleared);
+    resetFilters();
   };
 
   return (
@@ -157,9 +140,6 @@ const Filters: React.FC<FiltersProps> = ({ onChange, categories }) => {
             </Grid>
 
             <Grid container sx ={{mt : 2}}>
-            <Button variant="contained" onClick={handleApply}   >
-            Применить
-            </Button>
             <Button variant="outlined" onClick={handleReset}>
             Сбросить
             </Button>

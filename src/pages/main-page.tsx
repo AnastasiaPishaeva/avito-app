@@ -6,15 +6,16 @@ import api from "../api/api";
 import Filters from "../components/filters";
 import { useNavigate } from 'react-router-dom';
 import type { Product, Info } from "../types/product";
+import { useFilters, type FiltersState } from "../contexts/filter";
 
 
 const MainPage = () => {
     const [products, setProducts] = useState<Product[]>([]);
-    const [filters, setFilters] = useState<Record<string, any>>({});
     const [info, setInfo] = useState<Info>();
     const [categoriesArray, setCategories] = useState<{ id: number; name: string }[]>([]);
     const [currentPage, setCurrentPage] = useState(1);
     const navigate = useNavigate();
+    const { filters, setFilters, resetFilters } = useFilters();
 
     const fetchAds = async (params: any = {}) => {
         try {
@@ -76,7 +77,7 @@ const MainPage = () => {
     
     return(
         <Box sx ={{width : "100%", display : "flex", flexDirection: "column" }}>
-        <Filters onChange={setFilters} categories={categoriesArray}/>
+        <Filters categories={categoriesArray}/>
         <Typography sx={{mb : 2}}>Всего объявлений: {info?.totalItems}</Typography>
         <Grid container spacing={6}>
             {products.map((card: Product) => (
