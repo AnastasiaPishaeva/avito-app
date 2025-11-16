@@ -31,14 +31,13 @@
 | Frontend           | React 19, TypeScript, React Router 7 |
 | UI                 | Material UI, Recharts, Swiper        |
 | HTTP               | Axios                                |
-| Сборка/Dev-server  | Vite                                 |
-| Backend (mock API) | Express (папка tech-int3-server)   |
+| Сборка             | Vite                                 |
+| Backend (mock API) | Express (папка tech-int3-server)     |
 
 ---
 
 ## Обоснование выбора необязательных технологий
 
-- Vite — быстрый дев-сервер и минимальная настройка для TypeScript/React. Встроенный HMR, простой proxy и оптимизированная production-сборка без ручной конфигурации Webpack.
 - Material UI — готовые адаптивные компоненты, тематизация и поддержка темной/светлой темы.
 - Axios —  легко можем задать базовый URL и обработку ошибок.
 - Recharts — быстрое построение графиков.
