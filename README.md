@@ -1,73 +1,87 @@
-# React + TypeScript + Vite
+- Главная страница `/list`
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+  - Карточки с изображением, названием, ценой, категорией, датой, статусом и приоритетом.
+  - Фильтры: статусы (множественный выбор), категория, диапазон цен, поиск, сортировки по дате/цене/приоритету, сброс.
+  - Пагинация и отображение общего количества объявлений.
 
-Currently, two official plugins are available:
+- Детальная страница `/item/:id`
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+  - Галерея изображений (Swiper), описание, характеристики, данные продавца.
+  - История модерации.
+  - Кнопки «Одобрить», «Отклонить», «Доработать» с модальным окном, шаблонными причинами и комментарием.
+  - Навигация «Назад/Вперёд» между объявлениями с учётом активных фильтров.
+  - Переходы к соседним объявлениям и горячие клавиши: A — одобрить, D — отклонить, ← / → — листать.
 
-## React Compiler
+- Страница статистики `/stats`
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+  - Карточки с ключевыми метриками.
+  - Графики активности, распределения решений и категорий.
+  - Выбор периода (день/неделя/месяц).
 
-## Expanding the ESLint configuration
+- Дополнительно
+  - Темная/светлая тема (Material UI Theme provider, переключатель в хедере).
+  - Контекст фильтров (React Context).
+  - Axios-инстанс с базовым URL и обработкой ошибок.
+---
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## Технологический стек
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+| Категория          | Инструменты                          |
+| ------------------ | ------------------------------------ |
+| Frontend           | React 19, TypeScript, React Router 7 |
+| UI                 | Material UI, Recharts, Swiper        |
+| HTTP               | Axios                                |
+| Сборка/Dev-server  | Vite                                 |
+| Backend (mock API) | Express (папка tech-int3-server)   |
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+---
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+## Обоснование выбора необязательных технологий
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+- Vite — быстрый дев-сервер и минимальная настройка для TypeScript/React. Встроенный HMR, простой proxy и оптимизированная production-сборка без ручной конфигурации Webpack.
+- Material UI — готовые адаптивные компоненты, тематизация и поддержка темной/светлой темы.
+- Axios —  легко можем задать базовый URL и обработку ошибок.
+- Recharts — быстрое построение графиков.
+- Swiper — готовый карусельный компонент для галереи изображений, с навигацией и адаптивом ― быстрее собственной реализации.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+---
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+## Структура проекта
+
+├─ avito-app/                    
+│  ├─ src/
+│  │  ├─ components/              
+│  │  ├─ contexts/                
+│  │  ├─ pages/                  
+│  │  ├─ api/api.ts               
+│  │  └─ types/product.ts         
+│  └─ vite.config.ts             
+└─ tech/.../tech-int3-server/    
+   ├─ server.js
+   └─ src/
+      ├─ controllers/v1
+      ├─ routes/v1
+      └─ models/v1/data.js
+      
+---
+
+## Локальный запуск
+
+### 1. Сервер (mock API)
+
+cd tech/tech-internship/Tech Internships/Frontend/Frontend-trainee-assignment-autumn-2025/tech-int3-server
+npm install
+npm run dev
+
+### 2. Клиент
+В отдельном терминале:
+
+cd avito-app
+npm install
+npm run dev
+
+## Навигация
+
+- /list — список объявлений, фильтры, сортировки.
+- /item/:id — детальная карточка с модерацией.
+- /stats — аналитика с графиками.
