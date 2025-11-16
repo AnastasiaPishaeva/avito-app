@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, type ReactNode } from "react";
+import type { Product } from "../types/product";
 
 export interface FiltersState {
   status: string[];
@@ -14,6 +15,7 @@ interface FiltersContextProps {
   filters: FiltersState;
   setFilters: (filters: FiltersState) => void;
   resetFilters: () => void;
+  ads: Product[];
 }
 
 const FiltersContext = createContext<FiltersContextProps | undefined>(undefined);

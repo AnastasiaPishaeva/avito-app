@@ -7,9 +7,11 @@ import "swiper/css";
 import "swiper/css/navigation";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from "swiper/modules";
+import { useNavigate } from 'react-router-dom';
 import api from '../api/api';
 import { useTheme } from "@mui/material/styles";
 import type { Product, ModeratorHistory, } from "../types/product";
+import { useFilters, type FiltersState } from "../contexts/filter";
 
 export const formatDate = (date: string ) => {
     const formattedDate = new Date(date);
@@ -38,6 +40,7 @@ export const Table = ({  rows }: { rows: string[][] }) => {
 
 const AdDetailsPage = () => {
   const theme = useTheme();
+  const navigate = useNavigate();
   const { adId } = useParams();
   const [adDetails, setAdDetails] = useState<Product>({} as Product);
   const [open, setOpen] = useState(false);
@@ -47,6 +50,10 @@ const AdDetailsPage = () => {
   const [flag, setFlag] = useState(false);
   const [customReason, setCustomReason] = useState("");
   const [error, setError] = useState(""); 
+  const [adsOrder, setAdsOrder] = useState<number[]>([]);
+  const [currentIndex, setCurrentIndex] = useState<number>(-1);
+  const { filters,} = useFilters();
+
   const reasons = [
     "Запрещенный товар",
     "Неверная категория",
@@ -57,7 +64,17 @@ const AdDetailsPage = () => {
     ];
 
 
-  const fetchAd = async () => {
+    const fetchAll = async (params: any = {}) => {
+        try {
+        const res = await api.get(`/ads`, {params: filters});
+        console.log("данные с сервера:", res.data);
+        setAdsOrder(res.data.items.map(ad => ad.id));
+        } catch (err) {
+        console.error("Ошибка загрузки списка:", err);
+        }
+    };
+
+    const fetchAd = async () => {
         try {
         const res = await api.get(`/ads/${adId}`);
         console.log("данные с сервера:", res.data);
@@ -76,7 +93,21 @@ const AdDetailsPage = () => {
         console.error("Ошибка одобрения", err);
         }
     };
-    
+
+    const handlePrevAd = () => {
+        if (currentIndex > 0) {
+        const prevId = adsOrder[currentIndex - 1];
+        navigate(`/item/${prevId}`);
+        }
+    };
+
+    const handleNextAd = () => {
+        if (currentIndex >= 0 && currentIndex < adsOrder.length - 1) {
+        const nextId = adsOrder[currentIndex + 1];
+        navigate(`/item/${nextId}`);
+        }
+    };
+        
     const openModal = (type: "reject" | "requestChanges") => {
         setActionType(type);
         setOpen(true);
@@ -123,7 +154,14 @@ const AdDetailsPage = () => {
     useEffect(() => {
         setFlag(false);
         fetchAd();
+        fetchAll();
         }, [flag]);
+
+    useEffect(() => {
+        if (!adId || !adsOrder) return;
+        const index = adsOrder.findIndex((id) => String(id) === String(adId));
+        setCurrentIndex(index)
+    }, [adId, adsOrder]);
 
   return(
     <Box sx = {{width : "100%"}}>
@@ -223,10 +261,22 @@ const AdDetailsPage = () => {
                 </Button>
             </Grid>
         </Grid>
-        <Grid container spacing={4} sx = {{mt : 6}}>
-            <Link to="/" style ={{color : theme.palette.text.primary, textDecoration: "none", cursor: "pointer",}}>
-                ← К списку
-            </Link>
+        <Grid container spacing={4} sx = {{mt : 6, justifyContent: "space-between"}}>
+            <Grid>
+                <Link to="/" style ={{color : theme.palette.text.primary, textDecoration: "none", cursor: "pointer",}}>
+                    ← К списку
+                </Link>
+            </Grid>
+            <Grid>
+                <Button  onClick = {handlePrevAd} disabled={currentIndex <= 0 }
+                style ={{color : theme.palette.text.primary, textDecoration: "none", cursor: "pointer", marginRight : 2}}>
+                    ← Назад  
+                </Button>
+                <Button  onClick = {handleNextAd} disabled={currentIndex === -1 || currentIndex >= adsOrder.length - 1}
+                 style ={{color : theme.palette.text.primary, textDecoration: "none", cursor: "pointer",}}>
+                     Вперед →
+                </Button>
+            </Grid>
         </Grid>
 
 

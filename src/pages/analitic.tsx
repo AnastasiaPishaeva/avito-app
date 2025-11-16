@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import {Grid, Typography, Box, Card, CardContent, Button, TextField, MenuItem } from "@mui/material";
 import api from '../api/api';
 import { useTheme } from "@mui/material/styles";
-import type { ActivityData, DecisionsData, Moderator, ModeratorStats, Statistic, StatsSummary} from "../types/product";
+import type { ActivityData, DecisionsData, StatsSummary} from "../types/product";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 
 export const formatDate = (date: string ) => {

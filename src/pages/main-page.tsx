@@ -15,7 +15,7 @@ const MainPage = () => {
     const [categoriesArray, setCategories] = useState<{ id: number; name: string }[]>([]);
     const [currentPage, setCurrentPage] = useState(1);
     const navigate = useNavigate();
-    const { filters, setFilters, resetFilters } = useFilters();
+    const { filters,} = useFilters();
 
     const fetchAds = async (params: any = {}) => {
         try {
@@ -52,7 +52,7 @@ const MainPage = () => {
 
             setCategories(Array.from(categories, ([id, name]) => ({ id, name })));
             setProducts(res.data.ads);
-            setInfo(res.data.pagination)
+            setInfo(res.data.pagination);
             console.log("Получено с сервера:", res.data);
 
             } catch (err) {
