@@ -30,7 +30,7 @@ const CardOfProduct : React.FC<CardProps> = ({
         
     return (
         <Card>
-            <Grid container spacing={2}> 
+            <Grid container spacing={2} > 
             <Grid size={{ xs: 8, sm: 4 }}
             sx ={{padding: 4}}
             >

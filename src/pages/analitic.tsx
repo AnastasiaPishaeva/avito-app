@@ -69,7 +69,7 @@ const Analytics = () => {
     };
 
     const colors = [
-        "#8884d8", "#39bd6cff", "#ff9b58ff", "#d0ed57", "#e7ca38ff", "#d98aeb"
+        "#8884d8", "#39bd6cff", "#ff9b58ff", "#d0ed57", "#e7ca38ff", "#d98aeb", "#5d3dbeff"
     ];
 
     const chartData1 = activityData.map(day => ({
@@ -171,7 +171,7 @@ const Analytics = () => {
             </ResponsiveContainer>
         </Box>
 
-        <Box width="100%" height={350} mb = {8}>
+        <Box width="100%" height={350} mb = {10}>
             <Typography mb={2} sx={{ textAlign: "center" }}>
                 Диаграмма распределения решений
             </Typography>

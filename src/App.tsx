@@ -6,10 +6,12 @@ import MainPage from './pages/main-page';
 import AdDetailsPage from './pages/item-page';
 import Analytics from './pages/analitic';
 import Header from './components/header';
+import {FiltersProvider} from './contexts/filter';
 
 function App() {
   return (
     <ThemeProviderWrapper>
+      <FiltersProvider>
       <CssBaseline>
         <BrowserRouter>
         <Header/>
@@ -20,6 +22,7 @@ function App() {
         </Routes>
       </BrowserRouter>
       </CssBaseline>
+      </FiltersProvider>
     </ThemeProviderWrapper>
   )
 }

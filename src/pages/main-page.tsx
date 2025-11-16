@@ -65,7 +65,7 @@ const MainPage = () => {
         const categories = new Map<number, string>(); 
 
             res.data.ads.forEach((ad: any) => {
-                if (ad.categoryId && ad.category) {
+                if (ad.categoryId + 1 && ad.category) {
                 categories.set(ad.categoryId, ad.category);
                 }
             });
@@ -78,7 +78,7 @@ const MainPage = () => {
         <Box sx ={{width : "100%", display : "flex", flexDirection: "column" }}>
         <Filters onChange={setFilters} categories={categoriesArray}/>
         <Typography sx={{mb : 2}}>Всего объявлений: {info?.totalItems}</Typography>
-        <Grid container spacing={6} sx ={{flexGrow: 1}}>
+        <Grid container spacing={6}>
             {products.map((card: Product) => (
                 <Grid size={{ xs: 12, sm: 6 }} 
                 key={card.id}
