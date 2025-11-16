@@ -32,7 +32,25 @@ const MainPage = () => {
                 page: currentPage,
                 limit: info?.itemsPerPage
             };
+
+            const queryParams1 = {
+                ...params,
+                status: finalStatus,
+                page: currentPage,
+                limit: 300
+            };
+
             const res = await api.get("/ads", { params: queryParams });
+            const res1 = await api.get("/ads",  { params: queryParams1 });
+            const categories = new Map<number, string>(); 
+
+            res1.data.ads.forEach((ad: any) => {
+                if (ad.categoryId + 1 && ad.category) {
+                categories.set(ad.categoryId, ad.category);
+                }
+            });
+
+            setCategories(Array.from(categories, ([id, name]) => ({ id, name })));
             setProducts(res.data.ads);
             setInfo(res.data.pagination)
             console.log("Получено с сервера:", res.data);
@@ -57,23 +75,6 @@ const MainPage = () => {
     useEffect(() => {
         fetchAds(filters);
     }, [filters,  currentPage]);
-
-    useEffect(() => {
-        api
-      .get("/ads") 
-      .then((res) => {
-        console.log("Получено с сервера:", res.data);
-        const categories = new Map<number, string>(); 
-
-            res.data.ads.forEach((ad: any) => {
-                if (ad.categoryId + 1 && ad.category) {
-                categories.set(ad.categoryId, ad.category);
-                }
-            });
-            setCategories(Array.from(categories, ([id, name]) => ({ id, name })));
-      })
-      .catch((err) => console.error("Ошибка загрузки данных:", err));
-    }, [])
     
     return(
         <Box sx ={{width : "100%", display : "flex", flexDirection: "column" }}>
