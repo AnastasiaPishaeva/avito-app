@@ -21,6 +21,7 @@ const Analytics = () => {
   const [period, setPeriod] = useState<string>("week");
   const [activityData, setActivityData] = useState<ActivityData[]>([]);
   const [decisionsData, setDecisionsData] = useState<DecisionsData>();
+  const [categoryData, setCategoryData] = useState<{ name: string; value: number }[]>([]);
   const fetchStat = async (params = {}) => {
         try {
         const res = await api.get(`/stats/summary`, { params: {period} });
@@ -55,6 +56,22 @@ const Analytics = () => {
         }
     };
 
+    const fetchCategory = async () => {
+      try {
+        const res = await api.get("/stats/chart/categories", {
+          params: { period },
+        });
+        const chartData = Object.entries(res.data).map(([name, value]) => ({ name, value: Number(value) }));
+        setCategoryData(chartData);
+      } catch (err) {
+        console.error("Ошибка загрузки данных по категориям:", err);
+      }
+    };
+
+    const colors = [
+        "#8884d8", "#39bd6cff", "#ff9b58ff", "#d0ed57", "#e7ca38ff", "#d98aeb"
+    ];
+
     const chartData1 = activityData.map(day => ({
         date: new Date(day.date).toLocaleDateString("ru-RU", { weekday: "short", day: "numeric", month: "numeric" }),
         Одобрено: day.approved,
@@ -63,16 +80,20 @@ const Analytics = () => {
     }));
 
     const chartData2 = [
-    { name: "Одобрено", value: decisionsData?.approved},
-    { name: "Отклонено", value: decisionsData?.rejected },
-    { name: "На доработку", value: decisionsData?.requestChanges },
-  ];
+        { name: "Одобрено", value: decisionsData?.approved},
+        { name: "Отклонено", value: decisionsData?.rejected },
+        { name: "На доработку", value: decisionsData?.requestChanges },
+    ];
     
+    const chartData3 = categoryData.map(elem => ({
+        name: elem.name, value: elem.value
+    }));
 
     useEffect(() => {
         fetchStat();
         fetchActivity();
         fetchDecisions();
+        fetchCategory();
         }, [period]);
 
 
@@ -126,7 +147,7 @@ const Analytics = () => {
                 <Card sx ={{width: "100%"}}>
                         <CardContent sx = {{padding : theme.spacing(2, 2)}}>
                             <Typography sx = {{fontWeight: "bold", color: theme.palette.purple.light, textAlign: "center"}}> Среднее время</Typography>
-                                <Typography sx = {{fontWeight: "bold", fontSize : "25px"}}> {(statisticInfo.averageReviewTime / 60).toFixed(1) } мин.</Typography>     
+                                <Typography sx = {{fontWeight: "bold", fontSize : "25px"}}> {(statisticInfo.averageReviewTime / 60000).toFixed(1) } мин.</Typography>     
                         </CardContent>
                     </Card>
             </Grid>
@@ -150,11 +171,11 @@ const Analytics = () => {
             </ResponsiveContainer>
         </Box>
 
-        <Box width="100%">
+        <Box width="100%" height={350} mb = {8}>
             <Typography mb={2} sx={{ textAlign: "center" }}>
                 Диаграмма распределения решений
             </Typography>
-            <ResponsiveContainer width="50%" height={300}>
+            <ResponsiveContainer width="100%" height="100%" >
                 <PieChart>
                     <Pie
                     data={chartData2}
@@ -168,6 +189,31 @@ const Analytics = () => {
                     <Cell  fill= {theme.palette.background.green} />
                     <Cell  fill={theme.palette.background.red} />
                     <Cell  fill={theme.palette.background.yellow} />
+                    </Pie>
+                    <Tooltip />
+                    <Legend />
+                </PieChart>
+                </ResponsiveContainer>
+        </Box>
+
+        <Box width="100%" height={350} mb = {8}>
+            <Typography mb={2} sx={{ textAlign: "center" }}>
+                Диаграмма категорий
+            </Typography>
+            <ResponsiveContainer width="100%" height="100%" >
+                <PieChart>
+                    <Pie
+                    data={chartData3}
+                    dataKey="value"
+                    nameKey="name"
+                    cx="50%"
+                    cy="50%"
+                    outerRadius={80}
+                    label
+                    >
+                    {chartData3.map((name, index) => (
+                        <Cell fill={colors[index]} />
+                    ))}
                     </Pie>
                     <Tooltip />
                     <Legend />

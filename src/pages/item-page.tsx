@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import {Grid, Typography, Box, Card, Divider, CardContent, Button } from "@mui/material";
+import {Grid, Typography, Box, Card, Divider, CardContent, Button, Dialog, TextField, RadioGroup,
+    DialogTitle, DialogContent, DialogActions, FormControlLabel, Radio
+ } from "@mui/material";
 import { useParams, Link } from 'react-router-dom';
 import "swiper/css";
 import "swiper/css/navigation";
@@ -38,6 +40,23 @@ const AdDetailsPage = () => {
   const theme = useTheme();
   const { adId } = useParams();
   const [adDetails, setAdDetails] = useState<Product>({} as Product);
+  const [open, setOpen] = useState(false);
+  const [actionType, setActionType] = useState<"reject" | "requestChanges" | null>(null);
+  const [reason, setReason] = useState("");
+  const [comment, setComment] = useState("");
+  const [flag, setFlag] = useState(false);
+  const [customReason, setCustomReason] = useState("");
+  const [error, setError] = useState(""); 
+  const reasons = [
+    "Запрещенный товар",
+    "Неверная категория",
+    "Некорректное описание",
+    "Проблемы с фото",
+    "Подозрение на мошенничество",
+    "Другое"
+    ];
+
+
   const fetchAd = async () => {
         try {
         const res = await api.get(`/ads/${adId}`);
@@ -47,11 +66,64 @@ const AdDetailsPage = () => {
         console.error("Ошибка загрузки объявления:", err);
         }
     };    
+
+    const handleApprove = async () => {
+        try {
+        const res = await api.post(`/ads/${adId}/approve`);
+        console.log("Одобрено:", res.data);
+        setFlag(true);
+        } catch (err) {
+        console.error("Ошибка одобрения", err);
+        }
+    };
     
+    const openModal = (type: "reject" | "requestChanges") => {
+        setActionType(type);
+        setOpen(true);
+    };
+
+    const handleReject = async () => {
+        if (!reason) {
+            setError("Введите причину");
+            return;
+        };
+
+        try {
+        const res = await api.post(`/ads/${adId}/reject`, { reason, comment });
+        console.log("Отклонено:", res.data);
+        setOpen(false);
+        setReason("");
+        setComment("");
+        setFlag(true);
+        setError("");
+        } catch (err) {
+        console.error("Ошибка отклонения", err);
+        }
+    };
+
+    const handleChanges = async () => {
+        if (!reason) if (!reason) {
+            setError("Введите причину");
+            return;
+        };
+
+        try {
+        const res = await api.post(`/ads/${adId}/request-changes`, { reason, comment });
+        console.log("Отклонено:", res.data);
+        setOpen(false);
+        setReason("");
+        setError("");
+        setComment("");
+        setFlag(true);
+        } catch (err) {
+        console.error("Ошибка отклонения", err);
+        }
+    }
 
     useEffect(() => {
+        setFlag(false);
         fetchAd();
-        }, []);
+        }, [flag]);
 
   return(
     <Box sx = {{width : "100%"}}>
@@ -102,14 +174,14 @@ const AdDetailsPage = () => {
                         <Typography sx = {{fontWeight: "bold", color: theme.palette.purple.light}}> Информация об объявлении</Typography>
                             <Grid sx = {{textAlign : "left"}}>
                             <Typography> {adDetails.title}</Typography> 
-                            {/* Объявление 10: Услуги для продажи */}
                             <Typography> Стоимость: {adDetails.price} рублей</Typography>
                             <Typography> Категория: {adDetails.category}</Typography>
                             <Typography> Дата создания: {formatDate(adDetails.createdAt)}</Typography>
                             <Typography> Дата изменения: {formatDate(adDetails.updatedAt)}</Typography>
                             <Typography> Статус: {adDetails.status === "pending" ? ("На модерации") : 
                             adDetails.status === "approved" ? ("Одобрено") :
-                            adDetails.status === "rejected" ? ("Отклонено") : ("Error")}</Typography>
+                            adDetails.status === "rejected" ? ("Отклонено") :
+                            adDetails.status === "draft" ? ("Черновик") :("Error")}</Typography>
                             <Typography> Приоритет: {adDetails.priority === "normal" ? ("Обычный") :
                             adDetails.priority === "urgent" ? ("Срочный") : ("Error")}</Typography>
                             <br/>
@@ -136,17 +208,17 @@ const AdDetailsPage = () => {
         </Grid>
         <Grid container spacing = {{xs : 4, sm: 8}} sx = {{mt : 4, justifyContent: "center"}}>
             <Grid size = {{xs: 9, sm : 4}} >
-                <Button sx ={{background : theme.palette.background.green, color : "black", width : "100%", boxShadow : 2}}>
+                <Button onClick={handleApprove} sx ={{background : theme.palette.background.green, color : "black", width : "100%", boxShadow : 2}}>
                     Одобрить
                 </Button>
             </Grid>
             <Grid size = {{xs: 9, sm : 4}}>
-                <Button sx ={{background : theme.palette.background.red, color : "black", width : "100%", boxShadow : 2}}>
+                <Button onClick={() => openModal("reject")} sx ={{background : theme.palette.background.red, color : "black", width : "100%", boxShadow : 2}}>
                     Отклонить
                 </Button>
             </Grid>
             <Grid size = {{xs: 9, sm : 4}}>
-                <Button sx ={{background : theme.palette.background.yellow, color : "black", width : "100%", boxShadow : 2}}>
+                <Button onClick={() => openModal("requestChanges")} sx ={{background : theme.palette.background.yellow, color : "black", width : "100%", boxShadow : 2}}>
                     Доработать
                 </Button>
             </Grid>
@@ -155,9 +227,74 @@ const AdDetailsPage = () => {
             <Link to="/" style ={{color : theme.palette.text.primary, textDecoration: "none", cursor: "pointer",}}>
                 ← К списку
             </Link>
-
         </Grid>
 
+
+        <Dialog open={open} onClose={() => setOpen(false)}>
+        <DialogTitle>
+          {actionType === "reject" ? "Отклонить объявление" : "Запросить изменения"}
+        </DialogTitle>
+
+        <DialogContent sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 1 }}>
+          <Typography>Причина (обязательно)</Typography>
+          <RadioGroup
+                value={reasons.includes(reason) ? reason : "Другое"}
+                onChange={(e) => {
+                    const val = e.target.value;
+
+                    if (val !== "Другое") {
+                        setReason(val);
+                    } else {
+                        setReason(customReason); 
+                    }
+                }}
+    >
+                {reasons.map((r) => (
+                <FormControlLabel
+                    value={r}
+                    control={<Radio
+                        sx = {{
+                        '&.MuiRadio-root .MuiSvgIcon-root': {
+                        color: theme.palette.text.primary, 
+                        },
+                    }} />}
+                    label={r}
+                />
+                ))}
+            </RadioGroup>
+        {reason === customReason && (
+            <TextField
+                fullWidth
+                placeholder="Введите причину"
+                value={customReason}
+                onChange={(e) => {
+                    setCustomReason(e.target.value);
+                    setReason(e.target.value);
+                }}
+                sx={{ mt: 2 }}
+            />
+        )}
+
+          <Typography>Комментарий</Typography>
+          <TextField
+            multiline
+            minRows={2}
+            value={comment}
+            onChange={(e) => setComment(e.target.value)}
+          />
+
+        {error && (
+        <Typography color="error" sx={{ mt: 1 }}>
+            {error}
+    </Typography>
+)}
+        </DialogContent>
+
+        <DialogActions>
+          <Button onClick={() => setOpen(false)}>Отмена</Button>
+          <Button onClick={() => {actionType === "reject" ? handleReject() : handleChanges()}} variant="contained">Отправить</Button>
+        </DialogActions>
+      </Dialog>                   
     </Box>
   )
 }

@@ -58,9 +58,9 @@ const getTheme = (mode: "light" | "dark") =>
         paper: mode === "dark" ? "#34303ef8" : "#fff",
         card: mode === "dark" ? "#34303ef8" : "#eaddff",
         cardContent: mode === "dark" ? "#322e3bf8": "#EEEAF6",
-        red: mode === "dark" ? "#ec4f4fff": "#f57d81ff",
-        green: mode === "dark" ? "#3ac66dff": "#73e2a0ff",
-        yellow: mode === "dark" ? "#ecc63fff": "#f5ee60ff"},
+        red: mode === "dark" ? "#ed4545ff": "#f57d81ff",
+        green: mode === "dark" ? "#26c560ff": "#75e9a3ff",
+        yellow: mode === "dark" ? "#efd36eff": "#f5ee60ff"},
       text: {
         primary: mode === "dark" ? "#fff" : "#000",
         secondary: mode === "dark" ? "#000" : "#fff",

@@ -16,10 +16,18 @@ const MainPage = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const navigate = useNavigate();
 
-    const fetchAds = async (params = {}) => {
+    const fetchAds = async (params: any = {}) => {
         try {
+            const defaultStatuses = ["pending", "approved", "rejected"];
+            const finalStatus =
+            Array.isArray(params.status) && params.status.length > 0
+                ? params.status
+                : defaultStatuses;
+
+
             const queryParams = {
                 ...params,
+                status: finalStatus,
                 page: currentPage,
                 limit: info?.itemsPerPage
             };
