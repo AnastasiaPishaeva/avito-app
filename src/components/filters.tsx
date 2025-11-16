@@ -1,7 +1,6 @@
-import { useState } from "react";
 import { Box, TextField, MenuItem, Button, Typography, Grid } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
-import { useFilters, type FiltersState } from "../contexts/filter";
+import { useFilters } from "../contexts/filter";
 
 type FiltersProps = {
   categories: {id : number, name : string}[];

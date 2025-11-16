@@ -15,7 +15,6 @@ interface FiltersContextProps {
   filters: FiltersState;
   setFilters: (filters: FiltersState) => void;
   resetFilters: () => void;
-  ads: Product[];
 }
 
 const FiltersContext = createContext<FiltersContextProps | undefined>(undefined);

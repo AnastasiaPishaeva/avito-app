@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import {Grid, Typography, Box, Card, CardContent, Button, TextField, MenuItem } from "@mui/material";
+import {Grid, Typography, Box, Card, CardContent, TextField, MenuItem } from "@mui/material";
 import api from '../api/api';
 import { useTheme } from "@mui/material/styles";
 import type { ActivityData, DecisionsData, StatsSummary} from "../types/product";
