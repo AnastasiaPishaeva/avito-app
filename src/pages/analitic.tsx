@@ -69,7 +69,7 @@ const Analytics = () => {
     };
 
     const colors = [
-        "#8884d8", "#39bd6cff", "#ff9b58ff", "#d0ed57", "#e7ca38ff", "#d98aeb", "#5d3dbeff"
+        "#8884d8", "#39bd6cff", "#ff9b58ff", "#d0ed57", "#e7ca38ff", "#d98aeb", "#5d3dbeff", "#51dd1eff"
     ];
 
     const chartData1 = activityData.map(day => ({
