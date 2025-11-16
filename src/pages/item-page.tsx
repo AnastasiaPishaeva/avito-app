@@ -63,16 +63,50 @@ const AdDetailsPage = () => {
     "Другое"
     ];
 
+    const buildFiltersQuery = (params: FiltersState) => {
+    const defaultStatuses = ["pending", "approved", "rejected"];
+    const finalStatus =
+      Array.isArray(params.status) && params.status.length > 0
+        ? params.status
+        : defaultStatuses;
 
-    const fetchAll = async (params: any = {}) => {
-        try {
-        const res = await api.get(`/ads`, {params: filters});
-        console.log("данные с сервера:", res.data);
-        setAdsOrder(res.data.items.map(ad => ad.id));
-        } catch (err) {
-        console.error("Ошибка загрузки списка:", err);
-        }
+    const queryParams: Record<string, unknown> = {
+      ...params,
+      status: finalStatus,
+      page: 1,
+      limit: 300,
     };
+
+
+    if (!params.categoryId) {
+      delete queryParams.categoryId;
+    }
+
+    if (!params.search) {
+      delete queryParams.search;
+    }
+
+    if (!params.minPrice) {
+      delete queryParams.minPrice;
+    }
+
+    if (!params.maxPrice) {
+      delete queryParams.maxPrice;
+    }
+
+    return queryParams;
+  };
+
+  const fetchAll = async (params: FiltersState) => {
+    try {
+      const res = await api.get(`/ads`, { params: buildFiltersQuery(params) });
+      console.log("данные с сервера:", res.data);
+      const ids = res.data.ads ? res.data.ads.map((ad: Product) => ad.id) : [];
+      setAdsOrder(ids);
+    } catch (err) {
+      console.error("Ошибка загрузки списка:", err);
+    }
+  };
 
     const fetchAd = async () => {
         try {
@@ -133,7 +167,7 @@ const AdDetailsPage = () => {
     };
 
     const handleChanges = async () => {
-        if (!reason) if (!reason) {
+        if (!reason) {
             setError("Введите причину");
             return;
         };
@@ -152,13 +186,23 @@ const AdDetailsPage = () => {
     }
 
     useEffect(() => {
-        setFlag(false);
-        fetchAd();
-        fetchAll();
-        }, [flag]);
+        fetchAll(filters);
+    }, [filters]);
 
     useEffect(() => {
-        if (!adId || !adsOrder) return;
+        const loadAd = async () => {
+        await fetchAd();
+        if (flag) {
+            await fetchAll(filters);
+            setFlag(false);
+        }
+        };
+
+        loadAd();
+    }, [adId, flag, filters]);
+
+    useEffect(() => {
+        if (!adId ) return;
         const index = adsOrder.findIndex((id) => String(id) === String(adId));
         setCurrentIndex(index)
     }, [adId, adsOrder]);
