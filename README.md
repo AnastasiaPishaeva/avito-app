@@ -47,7 +47,7 @@
 ---
 
 ## Структура проекта
-
+```
 ├─ avito-app/                    
 │  ├─ src/
 │  │  ├─ components/              
@@ -62,13 +62,13 @@
       ├─ controllers/v1
       ├─ routes/v1
       └─ models/v1/data.js
-      
----
+``` 
 ---
 
-## Локальный запуск
 
-### 1. Сервер (mock API)
+## Запуск
+
+### 1. Сервер 
 
 ```
 cd tech/tech-internship/Tech Internships/Frontend/Frontend-trainee-assignment-autumn-2025/tech-int3-server
