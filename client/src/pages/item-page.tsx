@@ -1,0 +1,426 @@
+import React, { useState, useEffect } from 'react';
+import {Grid, Typography, Box, Card, Divider, CardContent, Button, Dialog, TextField, RadioGroup,
+    DialogTitle, DialogContent, DialogActions, FormControlLabel, Radio
+ } from "@mui/material";
+import { useParams, Link } from 'react-router-dom';
+import "swiper/css";
+import "swiper/css/navigation";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Navigation } from "swiper/modules";
+import { useNavigate } from 'react-router-dom';
+import api from '../api/api';
+import { useTheme } from "@mui/material/styles";
+import type { Product, ModeratorHistory, } from "../types/product";
+import { useFilters, type FiltersState } from "../contexts/filter";
+
+export const formatDate = (date: string ) => {
+    const formattedDate = new Date(date);
+    return formattedDate.toLocaleDateString("ru-RU", {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit"
+        })};
+export const Table = ({  rows }: { rows: string[][] }) => {
+    return (
+    <table style={{ marginTop: "1rem", borderCollapse: "collapse", marginBottom: "1rem" }}>
+        <tbody>
+        {rows.map((row, rIdx) => (
+            <tr key={rIdx}>
+            {row.map((cell, cIdx) => (
+                <td key={cIdx} style={{ border: "1px solid lightgray", padding: "4px" }}>{cell}</td>
+            ))}
+            </tr>
+        ))}
+        </tbody>
+    </table>
+    )
+};
+
+const AdDetailsPage = () => {
+  const theme = useTheme();
+  const navigate = useNavigate();
+  const { adId } = useParams();
+  const [adDetails, setAdDetails] = useState<Product>({} as Product);
+  const [open, setOpen] = useState(false);
+  const [actionType, setActionType] = useState<"reject" | "requestChanges" | null>(null);
+  const [reason, setReason] = useState("");
+  const [comment, setComment] = useState("");
+  const [flag, setFlag] = useState(false);
+  const [customReason, setCustomReason] = useState("");
+  const [error, setError] = useState(""); 
+  const [adsOrder, setAdsOrder] = useState<number[]>([]);
+  const [currentIndex, setCurrentIndex] = useState<number>(-1);
+  const { filters,} = useFilters();
+
+  const reasons = [
+    "Запрещенный товар",
+    "Неверная категория",
+    "Некорректное описание",
+    "Проблемы с фото",
+    "Подозрение на мошенничество",
+    "Другое"
+    ];
+
+    const buildFiltersQuery = (params: FiltersState) => {
+    const defaultStatuses = ["pending", "approved", "rejected"];
+    const finalStatus =
+      Array.isArray(params.status) && params.status.length > 0
+        ? params.status
+        : defaultStatuses;
+
+    const queryParams: Record<string, unknown> = {
+      ...params,
+      status: finalStatus,
+      page: 1,
+      limit: 300,
+    };
+
+
+    if (!params.categoryId) {
+      delete queryParams.categoryId;
+    }
+
+    if (!params.search) {
+      delete queryParams.search;
+    }
+
+    if (!params.minPrice) {
+      delete queryParams.minPrice;
+    }
+
+    if (!params.maxPrice) {
+      delete queryParams.maxPrice;
+    }
+
+    return queryParams;
+  };
+
+  const fetchAll = async (params: FiltersState) => {
+    try {
+      const res = await api.get(`/ads`, { params: buildFiltersQuery(params) });
+      console.log("данные с сервера:", res.data);
+      const ids = res.data.ads ? res.data.ads.map((ad: Product) => ad.id) : [];
+      setAdsOrder(ids);
+    } catch (err) {
+      console.error("Ошибка загрузки списка:", err);
+    }
+  };
+
+    const fetchAd = async () => {
+        try {
+        const res = await api.get(`/ads/${adId}`);
+        console.log("данные с сервера:", res.data);
+        setAdDetails(res.data);
+        } catch (err) {
+        console.error("Ошибка загрузки объявления:", err);
+        }
+    };    
+
+    const handleApprove = async () => {
+        try {
+        const res = await api.post(`/ads/${adId}/approve`);
+        console.log("Одобрено:", res.data);
+        setFlag(true);
+        } catch (err) {
+        console.error("Ошибка одобрения", err);
+        }
+    };
+
+    const handlePrevAd = () => {
+        if (currentIndex > 0) {
+        const prevId = adsOrder[currentIndex - 1];
+        navigate(`/item/${prevId}`);
+        }
+    };
+
+    const handleNextAd = () => {
+        if (currentIndex >= 0 && currentIndex < adsOrder.length - 1) {
+        const nextId = adsOrder[currentIndex + 1];
+        navigate(`/item/${nextId}`);
+        }
+    };
+        
+    const openModal = (type: "reject" | "requestChanges") => {
+        setActionType(type);
+        setOpen(true);
+    };
+
+    const handleReject = async () => {
+        if (!reason) {
+            setError("Введите причину");
+            return;
+        };
+
+        try {
+        const res = await api.post(`/ads/${adId}/reject`, { reason, comment });
+        console.log("Отклонено:", res.data);
+        setOpen(false);
+        setReason("");
+        setComment("");
+        setFlag(true);
+        setError("");
+        } catch (err) {
+        console.error("Ошибка отклонения", err);
+        }
+    };
+
+    const handleChanges = async () => {
+        if (!reason) {
+            setError("Введите причину");
+            return;
+        };
+
+        try {
+        const res = await api.post(`/ads/${adId}/request-changes`, { reason, comment });
+        console.log("Отклонено:", res.data);
+        setOpen(false);
+        setReason("");
+        setError("");
+        setComment("");
+        setFlag(true);
+        } catch (err) {
+        console.error("Ошибка отклонения", err);
+        }
+    }
+
+    useEffect(() => {
+        fetchAll(filters);
+    }, [filters]);
+
+    useEffect(() => {
+        const loadAd = async () => {
+        await fetchAd();
+        if (flag) {
+            await fetchAll(filters);
+            setFlag(false);
+        }
+        };
+
+        loadAd();
+    }, [adId, flag, filters]);
+
+    useEffect(() => {
+        if (!adId ) return;
+        const index = adsOrder.findIndex((id) => String(id) === String(adId));
+        setCurrentIndex(index)
+    }, [adId, adsOrder]);
+
+    useEffect(() => {
+        const onKeyDown = (e: KeyboardEvent) => {
+            if (e.key === "ArrowRight") {
+                e.preventDefault();
+                handleNextAd();
+            }
+
+            if (e.key === "ArrowLeft") {
+                e.preventDefault();
+                handlePrevAd();
+            }
+
+
+            if (e.key.toLowerCase() === "a") {
+                e.preventDefault();
+                handleApprove();
+            }
+
+
+            if (e.key.toLowerCase() === "d") {
+                e.preventDefault();
+                openModal("reject");
+            }
+        };
+
+        window.addEventListener("keydown", onKeyDown);
+        return () => window.removeEventListener("keydown", onKeyDown);
+    }, [currentIndex, adsOrder, adId]);
+
+
+  return(
+    <Box sx = {{width : "100%"}}>
+        <Grid container spacing={3}>
+            <Grid size={{xs : 12, sm : 6}}>
+            <Swiper
+            modules={[Navigation]}
+            navigation
+            slidesPerView={1}
+            >
+            {adDetails.images && adDetails.images.map((picture: string, index: number) => (
+                <SwiperSlide key={index} >
+                <img
+                src={picture}
+                alt={`Фото объявления номер ${index + 1}`}
+                style={{
+                    width: "100%",
+                    height: "auto",
+                    objectFit: "cover",
+                    borderRadius: "12px"
+                }}/>
+                </SwiperSlide>
+            ))}
+            </Swiper>
+            </Grid>
+            <Grid size={{xs : 12, sm : 6}} >
+                <Card sx ={{height : "100%"}}>
+                    <CardContent>
+                        <Typography sx = {{fontWeight: "bold", color: theme.palette.purple.light}}> История модерации</Typography>
+                        {adDetails.moderationHistory && adDetails.moderationHistory.map((chel: ModeratorHistory, index: number) => (
+                            <Grid sx = {{textAlign : "left"}}>
+                            <Typography> Имя: {chel.moderatorName} </Typography>
+                            <Typography> Дата и время: {formatDate(chel.timestamp)} </Typography>
+                            <Typography> Решение: {chel.action === "requestChanges" ? ("Запрос изменений") : 
+                            chel.action === "approved" ? ("Одобрен") :
+                            chel.action === "rejected" ? ("Отклонен") : ("Error")} </Typography>
+                            {chel.comment && <Typography> Комментрий: {chel.comment} </Typography>}
+                            <Divider sx ={{borderBottomWidth: "2px"}} />
+                            </Grid>
+                        ))}
+                    </CardContent>
+                </Card>
+            </Grid>
+        </Grid>
+        <Grid size = {{xs : 12}} sx = {{mt : 6, width : "100%"}}>
+             <Card >
+                    <CardContent>
+                        <Typography sx = {{fontWeight: "bold", color: theme.palette.purple.light}}> Информация об объявлении</Typography>
+                            <Grid sx = {{textAlign : "left"}}>
+                            <Typography> {adDetails.title}</Typography> 
+                            <Typography> Стоимость: {adDetails.price} рублей</Typography>
+                            <Typography> Категория: {adDetails.category}</Typography>
+                            <Typography> Дата создания: {formatDate(adDetails.createdAt)}</Typography>
+                            <Typography> Дата изменения: {formatDate(adDetails.updatedAt)}</Typography>
+                            <Typography> Статус: {adDetails.status === "pending" ? ("На модерации") : 
+                            adDetails.status === "approved" ? ("Одобрено") :
+                            adDetails.status === "rejected" ? ("Отклонено") :
+                            adDetails.status === "draft" ? ("Черновик") :("Error")}</Typography>
+                            <Typography> Приоритет: {adDetails.priority === "normal" ? ("Обычный") :
+                            adDetails.priority === "urgent" ? ("Срочный") : ("Error")}</Typography>
+                            <br/>
+                            <Typography sx = {{fontWeight: "bold", color: theme.palette.purple.light}}> Описание: </Typography>
+                            <Typography> {adDetails.description} </Typography>
+                            <br/>
+                            <Typography sx = {{fontWeight: "bold", color: theme.palette.purple.light}}> Характеристики: </Typography>
+                            {adDetails.characteristics && (
+                                <Table rows={Object.entries(adDetails.characteristics)} />
+                                )}
+                            <Typography sx = {{fontWeight: "bold", color: theme.palette.purple.light}}> Продавец </Typography>
+                            {adDetails.seller && 
+                            <Grid>
+                            <Typography> Имя: {adDetails.seller.name} </Typography>
+                            <Typography> Рейтинг: {adDetails.seller.rating} </Typography>
+                            <Typography> Количество объявлений: {adDetails.seller.totalAds} </Typography>
+                            <Typography> На сайте с: {formatDate(adDetails.seller.registeredAt)} </Typography>
+                            </Grid>}
+                            
+                            </Grid>
+                    
+                    </CardContent>
+                </Card>
+        </Grid>
+        <Grid container spacing = {{xs : 4, sm: 8}} sx = {{mt : 4, justifyContent: "center"}}>
+            <Grid size = {{xs: 9, sm : 4}} >
+                <Button onClick={handleApprove} sx ={{background : theme.palette.background.green, color : "black", width : "100%", boxShadow : 2}}>
+                    Одобрить
+                </Button>
+            </Grid>
+            <Grid size = {{xs: 9, sm : 4}}>
+                <Button onClick={() => openModal("reject")} sx ={{background : theme.palette.background.red, color : "black", width : "100%", boxShadow : 2}}>
+                    Отклонить
+                </Button>
+            </Grid>
+            <Grid size = {{xs: 9, sm : 4}}>
+                <Button onClick={() => openModal("requestChanges")} sx ={{background : theme.palette.background.yellow, color : "black", width : "100%", boxShadow : 2}}>
+                    Доработать
+                </Button>
+            </Grid>
+        </Grid>
+        <Grid container spacing={4} sx = {{mt : 6, justifyContent: "space-between"}}>
+            <Grid>
+                <Link to="/" style ={{color : theme.palette.text.primary, textDecoration: "none", cursor: "pointer",}}>
+                    ← К списку
+                </Link>
+            </Grid>
+            <Grid>
+                <Button  onClick = {handlePrevAd} disabled={currentIndex <= 0 }
+                style ={{color : theme.palette.text.primary, textDecoration: "none", cursor: "pointer", marginRight : 2}}>
+                    ← Назад  
+                </Button>
+                <Button  onClick = {handleNextAd} disabled={currentIndex === -1 || currentIndex >= adsOrder.length - 1}
+                 style ={{color : theme.palette.text.primary, textDecoration: "none", cursor: "pointer",}}>
+                     Вперед →
+                </Button>
+            </Grid>
+        </Grid>
+
+
+        <Dialog open={open} onClose={() => setOpen(false)}>
+        <DialogTitle>
+          {actionType === "reject" ? "Отклонить объявление" : "Запросить изменения"}
+        </DialogTitle>
+
+        <DialogContent sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 1 }}>
+          <Typography>Причина (обязательно)</Typography>
+          <RadioGroup
+                value={reasons.includes(reason) ? reason : "Другое"}
+                onChange={(e) => {
+                    const val = e.target.value;
+
+                    if (val !== "Другое") {
+                        setReason(val);
+                    } else {
+                        setReason(customReason); 
+                    }
+                }}
+    >
+                {reasons.map((r) => (
+                <FormControlLabel
+                    value={r}
+                    control={<Radio
+                        sx = {{
+                        '&.MuiRadio-root .MuiSvgIcon-root': {
+                        color: theme.palette.text.primary, 
+                        },
+                    }} />}
+                    label={r}
+                />
+                ))}
+            </RadioGroup>
+        {reason === customReason && (
+            <TextField
+                fullWidth
+                placeholder="Введите причину"
+                value={customReason}
+                onChange={(e) => {
+                    setCustomReason(e.target.value);
+                    setReason(e.target.value);
+                }}
+                sx={{ mt: 2 }}
+            />
+        )}
+
+          <Typography>Комментарий</Typography>
+          <TextField
+            multiline
+            minRows={2}
+            value={comment}
+            onChange={(e) => setComment(e.target.value)}
+          />
+
+        {error && (
+        <Typography color="error" sx={{ mt: 1 }}>
+            {error}
+    </Typography>
+)}
+        </DialogContent>
+
+        <DialogActions>
+          <Button onClick={() => setOpen(false)}>Отмена</Button>
+          <Button onClick={() => {actionType === "reject" ? handleReject() : handleChanges()}} variant="contained">Отправить</Button>
+        </DialogActions>
+      </Dialog>                   
+    </Box>
+  )
+}
+export default AdDetailsPage;
+
